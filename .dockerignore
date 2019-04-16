@@ -1,4 +1,5 @@
 *
-!*.go
+!proxy
+!main.go
 !go.mod
 !go.sum
