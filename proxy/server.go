@@ -2,7 +2,6 @@ package proxy
 
 import (
 	"net/http"
-	"strings"
 	"time"
 
 	ginzap "github.com/gin-contrib/zap"
@@ -31,9 +30,14 @@ func (proxy Proxy) Server(options ServerOptions) *http.Server {
 }
 
 func (proxy Proxy) GetPackageHandler(c *gin.Context) {
-	key := c.Request.URL.Path
+	var name string
+	if c.Param("name") != "" {
+		name = c.Param("scope") + "/" + c.Param("name")
+	} else {
+		name = c.Param("scope")
+	}
 
-	pkg, err := proxy.GetMetadata(key, c.Request.Header)
+	pkg, err := proxy.GetMetadata(name, c.Request.URL.Path, c.Request.Header)
 
 	if err != nil {
 		c.AbortWithError(500, err)
@@ -43,9 +47,11 @@ func (proxy Proxy) GetPackageHandler(c *gin.Context) {
 }
 
 func (proxy Proxy) NoRouteHandler(c *gin.Context) {
-	if strings.Contains(c.Request.URL.Path, ".tgz") {
-		proxy.GetPackageHandler(c)
-	} else if c.Request.URL.Path == "/" {
+	// if strings.Contains(c.Request.URL.Path, ".tgz") {
+	// 	proxy.GetPackageHandler(c)
+	// } else
+
+	if c.Request.URL.Path == "/" {
 		_, err := proxy.RedisClient.Ping().Result()
 
 		if err != nil {
