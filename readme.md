@@ -12,8 +12,7 @@
 	- [License](#license)
 
 ## Download
-
-...
+You can download binary for your platform on the [Releases](https://github.com/emeralt/npm-cache-proxy/releases) page. Alternatively, you can use [Docker Image](https://cloud.docker.com/u/emeralt/repository/docker/emeralt/npm-cache-proxy).
 
 ## Usage
 
