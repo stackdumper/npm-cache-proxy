@@ -28,7 +28,7 @@ Start proxy server.
 | `--cache-ttl <timeout>`       | `CACHE_TTL`        | `3600`                       | Cache expiration timeout in seconds |
 | `--redis-address <address>`   | `REDIS_ADDRESS`    | `http://localhost:6379`      | Redis address                       |
 | `--redis-database <database>` | `REDIS_DATABASE`   | `0`                          | Redis database                      |
-| `--redis-password <password>` | `REDIS_PASS`       | -                            | Redis password                      |
+| `--redis-password <password>` | `REDIS_PASSWORD`       | -                            | Redis password                      |
 | `--redis-prefix <prefix>`     | `REDIS_PREFIX`     | `ncp-`                       | Redis keys prefix                   |
 
 ### `ncp list`
