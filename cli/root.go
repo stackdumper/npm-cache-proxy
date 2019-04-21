@@ -1,11 +1,9 @@
 package cli
 
 import (
-	"net/http"
 	"time"
 
 	npmproxy "github.com/emeralt/npm-cache-proxy/proxy"
-	"github.com/go-redis/redis"
 	"github.com/spf13/cobra"
 )
 
@@ -13,28 +11,33 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "ncp",
 	Short: "ncp is a fast npm cache proxy that stores data in Redis",
-	Run: func(cmd *cobra.Command, args []string) {
-		proxy := npmproxy.Proxy{
-			RedisClient: redis.NewClient(&redis.Options{}),
-			HttpClient: &http.Client{
-				Transport: http.DefaultTransport,
-			},
-			GetOptions: getOptions,
-		}
-
-		proxy.Server(npmproxy.ServerOptions{
-			ListenAddress: "localhost:8080",
-		}).ListenAndServe()
-	},
+	Run:   run,
 }
 
-func getOptions() (npmproxy.Options, error) {
-	return npmproxy.Options{
-		RedisPrefix:        "ncp-",
-		RedisExpireTimeout: 1 * time.Hour,
+var rootOptions struct {
+	ListenAddress   string
+	UpstreamAddress string
+	CacheLimit      string
+	CacheTTL        int
+}
 
-		UpstreamAddress:     "http://registry.npmjs.org",
-		ReplaceAddress:      "https://registry.npmjs.org",
-		StaticServerAddress: "http://localhost:8080",
-	}, nil
+func init() {
+	rootCmd.Flags().StringVar(&rootOptions.ListenAddress, "listen", getEnvString("LISTEN_ADDRESS", "localhost:8080"), "Address to listen")
+	rootCmd.Flags().StringVar(&rootOptions.UpstreamAddress, "upstream", getEnvString("UPSTREAM_ADDRESS", "https://registry.npmjs.org"), "Upstream registry address")
+	rootCmd.Flags().StringVar(&rootOptions.CacheLimit, "cache-limit", getEnvString("CACHE_LIMIT", "0"), "Cached packages count limit")
+	rootCmd.Flags().IntVar(&rootOptions.CacheTTL, "cache-ttl", getEnvInt("CACHE_TTL", "3600"), "Cache expiration timeout in seconds")
+}
+
+func run(cmd *cobra.Command, args []string) {
+	proxy := getProxy(func() (npmproxy.Options, error) {
+		return npmproxy.Options{
+			RedisPrefix:        persistentOptions.RedisPrefix,
+			RedisExpireTimeout: time.Duration(rootOptions.CacheTTL) * time.Second,
+			UpstreamAddress:    rootOptions.UpstreamAddress,
+		}, nil
+	})
+
+	proxy.Server(npmproxy.ServerOptions{
+		ListenAddress: rootOptions.ListenAddress,
+	}).ListenAndServe()
 }

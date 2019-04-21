@@ -17,8 +17,5 @@ type Proxy struct {
 type Options struct {
 	RedisPrefix        string
 	RedisExpireTimeout time.Duration
-
-	UpstreamAddress     string
-	ReplaceAddress      string
-	StaticServerAddress string
+	UpstreamAddress    string
 }

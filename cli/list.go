@@ -2,10 +2,8 @@ package cli
 
 import (
 	"fmt"
-	"net/http"
 
-	"github.com/emeralt/npm-cache-proxy/proxy"
-	"github.com/go-redis/redis"
+	npmproxy "github.com/emeralt/npm-cache-proxy/proxy"
 	"github.com/spf13/cobra"
 )
 
@@ -14,15 +12,13 @@ var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all cached packages",
 	Run: func(cmd *cobra.Command, args []string) {
-		prx := proxy.Proxy{
-			RedisClient: redis.NewClient(&redis.Options{}),
-			HttpClient: &http.Client{
-				Transport: http.DefaultTransport,
-			},
-			GetOptions: getOptions,
-		}
+		proxy := getProxy(func() (npmproxy.Options, error) {
+			return npmproxy.Options{
+				RedisPrefix: persistentOptions.RedisPrefix,
+			}, nil
+		})
 
-		metadatas, err := prx.ListMetadata()
+		metadatas, err := proxy.ListMetadata()
 		if err != nil {
 			panic(err)
 		}

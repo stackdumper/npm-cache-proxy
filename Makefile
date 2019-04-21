@@ -4,7 +4,7 @@ run:
 
 .PHONY: build
 build:
-	CGO_ENABLED=0 go build -ldflags="-w -s" -o build/router
+	gox -output=build/ncp_{{.OS}}_{{.Arch}}
 
 .PHONY: test
 test:

@@ -1,42 +1,81 @@
 # npm-cache-proxy
+
 ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/emeralt/npm-cache-proxy.svg?style=for-the-badge)
 
-
 - [npm-cache-proxy](#npm-cache-proxy)
-  - [Download](#download)
-  - [Usage](#usage)
-    - [`ncp`](#ncp)
-    - [`ncp list`](#ncp-list)
-    - [`ncp purge`](#ncp-purge)
-  - [Programmatic usage](#programmatic-usage)
-  - [License](#license)
+	- [Download](#download)
+	- [Usage](#usage)
+		- [`ncp`](#ncp)
+		- [`ncp list`](#ncp-list)
+		- [`ncp purge`](#ncp-purge)
+	- [Programmatic usage](#programmatic-usage)
+	- [License](#license)
 
 ## Download
+
 ...
 
 ## Usage
 
 ### `ncp`
+
 Start proxy server.
 
-| Options                   | Env           | Default                 | Description                 |
-| ------------------------- | ------------- | ----------------------- | --------------------------- |
-| `-p, --port <port>`       | `HTTP_PORT`   | `8080`                  | Port to listen to           |
-| `-l, --limit <count>`     | `CACHE_LIMIT` | -                       | Cached packages count limit |
-| `-t, --ttl <timeout>`     | `CACHE_TTL`   | `3600`                  | Cache expiration timeout    |
-| `-h, --host  <address>`   | `REDIS_HOST`  | `http://localhost:6379` | Redis address               |
-| `-d, --db <database>`     | `REDIS_DB`    | `0`                     | Redis database              |
-| `-a, --access <password>` | `REDIS_PASS`  | -                       | Redis password              |
-
+| Options                       | Env                | Default                      | Description                         |
+| ----------------------------- | ------------------ | ---------------------------- | ----------------------------------- |
+| `--listen <address>`          | `LISTEN_ADDRESS`   | `locahost:8080`              | Address to listen                   |
+| `--upstream <address>`        | `UPSTREAM_ADDRESS` | `https://registry.npmjs.org` | Upstream registry address           |
+| `--cache-limit <count>`       | `CACHE_LIMIT`      | -                            | Cached packages count limit         |
+| `--cache-ttl <timeout>`       | `CACHE_TTL`        | `3600`                       | Cache expiration timeout in seconds |
+| `--redis-address <address>`   | `REDIS_ADDRESS`    | `http://localhost:6379`      | Redis address                       |
+| `--redis-database <database>` | `REDIS_DATABASE`   | `0`                          | Redis database                      |
+| `--redis-password <password>` | `REDIS_PASS`       | -                            | Redis password                      |
+| `--redis-prefix <prefix>`     | `REDIS_PREFIX`     | `ncp-`                       | Redis keys prefix                   |
 
 ### `ncp list`
+
 List cached packages.
 
 ### `ncp purge`
-Purge cached pacakges.
+
+Purge cached packages.
 
 ## Programmatic usage
-...
+
+```golang
+package main
+
+import (
+	"net/http"
+	"time"
+
+	npmproxy "github.com/emeralt/npm-cache-proxy/proxy"
+	"github.com/go-redis/redis"
+)
+
+func main() {
+	proxy := npmproxy.Proxy{
+		RedisClient: redis.NewClient(&redis.Options{
+			Addr:     "localhost:6379",
+			DB:       0,
+			Password: "",
+		}),
+		HttpClient: &http.Client{},
+		GetOptions: func() (npmproxy.Options, error) {
+			return npmproxy.Options{
+				RedisPrefix:        "ncp-",
+				RedisExpireTimeout: 1 * time.Hour,
+				UpstreamAddress:    "https://registry.npmjs.org",
+			}, nil
+		},
+	}
+
+	proxy.Server(npmproxy.ServerOptions{
+		ListenAddress: "localhost:8080",
+	}).ListenAndServe()
+}
+```
 
 ## License
+
 [MIT](./license)
