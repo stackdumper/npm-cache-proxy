@@ -13,15 +13,16 @@ type ServerOptions struct {
 	ListenAddress string
 }
 
+// Server creates http proxy server
 func (proxy Proxy) Server(options ServerOptions) *http.Server {
 	router := gin.New()
 
 	logger, _ := zap.NewProduction()
 	router.Use(ginzap.Ginzap(logger, time.RFC3339, true))
 
-	router.GET("/:scope/:name", proxy.GetPackageHandler)
-	router.GET("/:scope", proxy.GetPackageHandler)
-	router.NoRoute(proxy.NoRouteHandler)
+	router.GET("/:scope/:name", proxy.getPackageHandler)
+	router.GET("/:scope", proxy.getPackageHandler)
+	router.NoRoute(proxy.noRouteHandler)
 
 	return &http.Server{
 		Handler: router,
@@ -29,7 +30,7 @@ func (proxy Proxy) Server(options ServerOptions) *http.Server {
 	}
 }
 
-func (proxy Proxy) GetPackageHandler(c *gin.Context) {
+func (proxy Proxy) getPackageHandler(c *gin.Context) {
 	var name string
 	if c.Param("name") != "" {
 		name = c.Param("scope") + "/" + c.Param("name")
@@ -47,7 +48,7 @@ func (proxy Proxy) GetPackageHandler(c *gin.Context) {
 	}
 }
 
-func (proxy Proxy) NoRouteHandler(c *gin.Context) {
+func (proxy Proxy) noRouteHandler(c *gin.Context) {
 	if c.Request.URL.Path == "/" {
 		err := proxy.Database.Health()
 

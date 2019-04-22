@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// GetMetadata returns cached NPM response for a given package path
+// GetMetadata returns cached NPM response for a given package path.
 func (proxy Proxy) GetMetadata(name string, originalPath string, request *http.Request) ([]byte, error) {
 	options, err := proxy.GetOptions()
 	if err != nil {
@@ -93,7 +93,7 @@ func (proxy Proxy) ListMetadata() ([]string, error) {
 	return deprefixedMetadata, nil
 }
 
-// PurgeMetadata deletes all cached packages
+// PurgeMetadata deletes all cached packages.
 func (proxy Proxy) PurgeMetadata() error {
 	options, err := proxy.GetOptions()
 	if err != nil {

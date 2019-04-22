@@ -3,16 +3,26 @@
 ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/emeralt/npm-cache-proxy.svg?style=for-the-badge)
 
 - [npm-cache-proxy](#npm-cache-proxy)
-	- [Download](#download)
+	- [Quick start](#quick-start)
+	- [Deployment](#deployment)
 	- [Usage](#usage)
 		- [`ncp`](#ncp)
 		- [`ncp list`](#ncp-list)
 		- [`ncp purge`](#ncp-purge)
 	- [Programmatic usage](#programmatic-usage)
+		- [Example](#example)
+	- [Benchmark](#benchmark)
 	- [License](#license)
 
-## Download
-You can download binary for your platform on the [Releases](https://github.com/emeralt/npm-cache-proxy/releases) page. Alternatively, you can use [Docker Image](https://cloud.docker.com/u/emeralt/repository/docker/emeralt/npm-cache-proxy).
+## Quick start
+Release binaries for different platforms can be downloaded on the [Releases](https://github.com/emeralt/npm-cache-proxy/releases) page. Also, [Docker Image](https://cloud.docker.com/u/emeralt/repository/docker/emeralt/npm-cache-proxy) is provided.
+
+```bash
+docker run -e REDIS_ADDRESS=host.docker.internal:6379 -p 8080:8080 -it emeralt/npm-cache-proxy
+```
+
+## Deployment
+NCP can be deployed using Kubernetes, Docker Compose or any other container orchestration platform. NCP supports running indefinite amount of instances simultaneously. 
 
 ## Usage
 
@@ -40,7 +50,13 @@ List cached packages.
 Purge cached packages.
 
 ## Programmatic usage
+Along with the CLI, go package is provided. Documentation is available on [godoc.org](https://godoc.org/github.com/emeralt/npm-cache-proxy/proxy).
 
+```bash
+go get -u github.com/emeralt/npm-cache-proxy/proxy
+```
+
+### Example
 ```golang
 package main
 
@@ -73,6 +89,23 @@ func main() {
 		ListenAddress: "localhost:8080",
 	}).ListenAndServe()
 }
+```
+
+## Benchmark
+
+```bash
+# GOMAXPROCS=1 GIN_MODE=release ncp --listen localhost:8080
+
+$ go-wrk -c 100 -d 5 http://localhost:8080/ascii
+Running 5s test @ http://localhost:8080/ascii
+  100 goroutine(s) running concurrently
+33321 requests in 5.00537759s, 212.69MB read
+Requests/sec:		6657.04
+Transfer/sec:		42.49MB
+Avg Req Time:		15.02169ms
+Fastest Request:	230.514µs
+Slowest Request:	571.420487ms
+Number of Errors:	0
 ```
 
 ## License
