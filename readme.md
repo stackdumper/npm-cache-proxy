@@ -16,7 +16,7 @@ npm-cache-proxy
   </a>
 </p>
 
-> `npm-cache-proxy` is a lightweight npm caching proxy written in Go that achives warp speeds by using Redis for data storage. B-b-blazing fast!
+> `npm-cache-proxy` is a lightweight npm caching proxy written in Go that achieves warp speeds by using Redis for data storage. B-b-blazing fast!
 
 
 <details>
