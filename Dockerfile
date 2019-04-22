@@ -16,8 +16,14 @@ RUN go test -v ./...
 RUN go build -ldflags="-w -s" -o build
 
 # === RUN STAGE === #
-FROM scratch as run
+FROM alpine as run
 
+RUN apk update \
+        && apk upgrade \
+        && apk add --no-cache ca-certificates \
+        && update-ca-certificates \
+        && rm -rf /var/cache/apk/*
+        
 WORKDIR /srv/app
 COPY --from=build /srv/app/build /srv/app/build
 
