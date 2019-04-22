@@ -10,16 +10,18 @@ import (
 
 func main() {
 	proxy := npmproxy.Proxy{
-		RedisClient: redis.NewClient(&redis.Options{
-			Addr:     "localhost:6379",
-			DB:       0,
-			Password: "",
-		}),
+		Database: npmproxy.DatabaseRedis{
+			Client: redis.NewClient(&redis.Options{
+				Addr:     "localhost:6379",
+				DB:       0,
+				Password: "",
+			}),
+		},
 		HttpClient: &http.Client{},
 		GetOptions: func() (npmproxy.Options, error) {
 			return npmproxy.Options{
-				RedisPrefix:        "ncp-",
-				RedisExpireTimeout: 1 * time.Hour,
+				DatabasePrefix:     "ncp-",
+				DatabaseExpiration: 1 * time.Hour,
 				UpstreamAddress:    "https://registry.npmjs.org",
 			}, nil
 		},

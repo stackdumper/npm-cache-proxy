@@ -12,7 +12,7 @@ var purgeCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		proxy := getProxy(func() (npmproxy.Options, error) {
 			return npmproxy.Options{
-				RedisPrefix: persistentOptions.RedisPrefix,
+				DatabasePrefix: persistentOptions.RedisPrefix,
 			}, nil
 		})
 

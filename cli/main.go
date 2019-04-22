@@ -27,11 +27,13 @@ func init() {
 
 func getProxy(getOptions func() (npmproxy.Options, error)) *npmproxy.Proxy {
 	return &npmproxy.Proxy{
-		RedisClient: redis.NewClient(&redis.Options{
-			Addr:     persistentOptions.RedisAddress,
-			DB:       persistentOptions.RedisDatabase,
-			Password: persistentOptions.RedisPassword,
-		}),
+		Database: npmproxy.DatabaseRedis{
+			Client: redis.NewClient(&redis.Options{
+				Addr:     persistentOptions.RedisAddress,
+				DB:       persistentOptions.RedisDatabase,
+				Password: persistentOptions.RedisPassword,
+			}),
+		},
 		HttpClient: &http.Client{
 			Transport: http.DefaultTransport,
 		},

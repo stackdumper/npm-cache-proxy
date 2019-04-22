@@ -31,8 +31,8 @@ func init() {
 func run(cmd *cobra.Command, args []string) {
 	proxy := getProxy(func() (npmproxy.Options, error) {
 		return npmproxy.Options{
-			RedisPrefix:        persistentOptions.RedisPrefix,
-			RedisExpireTimeout: time.Duration(rootOptions.CacheTTL) * time.Second,
+			DatabasePrefix:     persistentOptions.RedisPrefix,
+			DatabaseExpiration: time.Duration(rootOptions.CacheTTL) * time.Second,
 			UpstreamAddress:    rootOptions.UpstreamAddress,
 		}, nil
 	})

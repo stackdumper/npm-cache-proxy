@@ -3,19 +3,25 @@ package proxy
 import (
 	"net/http"
 	"time"
-
-	"github.com/go-redis/redis"
 )
 
 type Proxy struct {
-	RedisClient *redis.Client
-	HttpClient  *http.Client
+	Database   Database
+	HttpClient *http.Client
 
 	GetOptions func() (Options, error)
 }
 
 type Options struct {
-	RedisPrefix        string
-	RedisExpireTimeout time.Duration
+	DatabasePrefix     string
+	DatabaseExpiration time.Duration
 	UpstreamAddress    string
+}
+
+type Database interface {
+	Get(key string) (string, error)
+	Set(key string, value string, ttl time.Duration) error
+	Delete(key string) error
+	Keys(prefix string) ([]string, error)
+	Health() error
 }

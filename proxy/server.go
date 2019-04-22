@@ -52,7 +52,7 @@ func (proxy Proxy) NoRouteHandler(c *gin.Context) {
 	// } else
 
 	if c.Request.URL.Path == "/" {
-		_, err := proxy.RedisClient.Ping().Result()
+		err := proxy.Database.Health()
 
 		if err != nil {
 			c.AbortWithStatusJSON(503, err)

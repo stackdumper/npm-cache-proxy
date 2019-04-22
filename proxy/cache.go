@@ -13,8 +13,8 @@ func (proxy Proxy) GetMetadata(name string, originalPath string, header http.Hea
 		return nil, err
 	}
 
-	// get package from redis
-	pkg, err := proxy.RedisClient.Get(options.RedisPrefix + name).Result()
+	// get package from database
+	pkg, err := proxy.Database.Get(options.DatabasePrefix + name)
 
 	// either package doesn't exist or there's some other problem
 	if err != nil {
@@ -50,11 +50,11 @@ func (proxy Proxy) GetMetadata(name string, originalPath string, header http.Hea
 		pkg = string(body)
 
 		// save to redis
-		_, err = proxy.RedisClient.Set(
-			options.RedisPrefix+name,
+		err = proxy.Database.Set(
+			options.DatabasePrefix+name,
 			pkg,
-			options.RedisExpireTimeout,
-		).Result()
+			options.DatabaseExpiration,
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -74,14 +74,14 @@ func (proxy Proxy) ListMetadata() ([]string, error) {
 		return nil, err
 	}
 
-	metadata, err := proxy.RedisClient.Keys(options.RedisPrefix + "*").Result()
+	metadata, err := proxy.Database.Keys(options.DatabasePrefix)
 	if err != nil {
 		return nil, err
 	}
 
 	deprefixedMetadata := make([]string, 0)
 	for _, record := range metadata {
-		deprefixedMetadata = append(deprefixedMetadata, strings.Replace(record, options.RedisPrefix, "", 1))
+		deprefixedMetadata = append(deprefixedMetadata, strings.Replace(record, options.DatabasePrefix, "", 1))
 	}
 
 	return deprefixedMetadata, nil
@@ -94,13 +94,13 @@ func (proxy Proxy) PurgeMetadata() error {
 		return err
 	}
 
-	metadata, err := proxy.RedisClient.Keys(options.RedisPrefix + "*").Result()
+	metadata, err := proxy.Database.Keys(options.DatabasePrefix)
 	if err != nil {
 		return err
 	}
 
 	for _, record := range metadata {
-		_, err := proxy.RedisClient.Del(record).Result()
+		err := proxy.Database.Delete(record)
 		if err != nil {
 			return err
 		}
