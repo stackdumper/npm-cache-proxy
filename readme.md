@@ -49,7 +49,7 @@ import (
 	"time"
 
 	npmproxy "github.com/emeralt/npm-cache-proxy/proxy"
-	"github.com/go-redis/redis"
+	redis "github.com/go-redis/redis"
 )
 
 func main() {

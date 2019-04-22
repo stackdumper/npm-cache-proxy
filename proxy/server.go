@@ -37,20 +37,17 @@ func (proxy Proxy) GetPackageHandler(c *gin.Context) {
 		name = c.Param("scope")
 	}
 
-	pkg, err := proxy.GetMetadata(name, c.Request.URL.Path, c.Request.Header)
+	pkg, err := proxy.GetMetadata(name, c.Request.URL.Path, c.Request)
 
 	if err != nil {
 		c.AbortWithError(500, err)
 	} else {
+		// c.Header("Content-Encoding", "gzip")
 		c.Data(200, "application/json", pkg)
 	}
 }
 
 func (proxy Proxy) NoRouteHandler(c *gin.Context) {
-	// if strings.Contains(c.Request.URL.Path, ".tgz") {
-	// 	proxy.GetPackageHandler(c)
-	// } else
-
 	if c.Request.URL.Path == "/" {
 		err := proxy.Database.Health()
 

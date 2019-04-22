@@ -1,20 +1,24 @@
 package proxy
 
 import (
+	"compress/gzip"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 )
 
 // GetMetadata returns cached NPM response for a given package path
-func (proxy Proxy) GetMetadata(name string, originalPath string, header http.Header) ([]byte, error) {
+func (proxy Proxy) GetMetadata(name string, originalPath string, request *http.Request) ([]byte, error) {
 	options, err := proxy.GetOptions()
 	if err != nil {
 		return nil, err
 	}
 
+	key := options.DatabasePrefix + name
+
 	// get package from database
-	pkg, err := proxy.Database.Get(options.DatabasePrefix + name)
+	pkg, err := proxy.Database.Get(key)
 
 	// either package doesn't exist or there's some other problem
 	if err != nil {
@@ -29,18 +33,24 @@ func (proxy Proxy) GetMetadata(name string, originalPath string, header http.Hea
 		// fetch package
 		req, err := http.NewRequest("GET", options.UpstreamAddress+originalPath, nil)
 
-		// inherit headers from request
-		req.Header = header
-		if err != nil {
-			return nil, err
-		}
+		req.Header = request.Header
+		req.Header.Set("Accept-Encoding", "gzip")
 
 		res, err := proxy.HttpClient.Do(req)
 		if err != nil {
 			return nil, err
 		}
-
 		defer res.Body.Close()
+
+		if res.Header.Get("Content-Encoding") == "gzip" {
+			zr, err := gzip.NewReader(res.Body)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			res.Body = zr
+		}
+
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
 			return nil, err
@@ -50,11 +60,7 @@ func (proxy Proxy) GetMetadata(name string, originalPath string, header http.Hea
 		pkg = string(body)
 
 		// save to redis
-		err = proxy.Database.Set(
-			options.DatabasePrefix+name,
-			pkg,
-			options.DatabaseExpiration,
-		)
+		err = proxy.Database.Set(key, pkg, options.DatabaseExpiration)
 		if err != nil {
 			return nil, err
 		}
