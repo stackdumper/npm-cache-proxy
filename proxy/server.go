@@ -9,6 +9,7 @@ import (
 	zap "go.uber.org/zap"
 )
 
+// ServerOptions provides configuration for Server method
 type ServerOptions struct {
 	ListenAddress string
 }
