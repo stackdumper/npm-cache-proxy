@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"regexp"
 	"strings"
 )
 
@@ -36,7 +35,6 @@ func (proxy Proxy) GetCachedPath(options Options, path string, request *http.Req
 		if err != nil {
 			return nil, err
 		}
-		defer res.Body.Close()
 
 		if res.Header.Get("Content-Encoding") == "gzip" {
 			zr, err := gzip.NewReader(res.Body)
@@ -47,14 +45,17 @@ func (proxy Proxy) GetCachedPath(options Options, path string, request *http.Req
 			res.Body = zr
 		}
 
+		defer res.Body.Close()
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
 			return nil, err
 		}
 
-		// TODO: avoid calling MustCompile every time
-		// find "dist": "https?://.*/ and replace to "dist": "{localurl}/
-		pkg = regexp.MustCompile(`(?U)"tarball":"https?://.*/`).ReplaceAllString(string(body), `"dist": "http://localhost:8080/`)
+		pkg = string(body)
+
+		// // TODO: avoid calling MustCompile every time
+		// // find "dist": "https?://.*/ and replace to "dist": "{localurl}/
+		// pkg = regexp.MustCompile(`(?U)"tarball":"https?://.*/`).ReplaceAllString(string(body), `"dist": "http://localhost:8080/`)
 
 		// save to redis
 		err = proxy.Database.Set(key, pkg, options.DatabaseExpiration)
