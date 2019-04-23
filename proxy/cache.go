@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
 )
 
@@ -53,9 +54,9 @@ func (proxy Proxy) GetCachedPath(options Options, path string, request *http.Req
 
 		pkg = string(body)
 
-		// // TODO: avoid calling MustCompile every time
-		// // find "dist": "https?://.*/ and replace to "dist": "{localurl}/
-		// pkg = regexp.MustCompile(`(?U)"tarball":"https?://.*/`).ReplaceAllString(string(body), `"dist": "http://localhost:8080/`)
+		// TODO: avoid calling MustCompile every time
+		// find "dist": "https?://.*/ and replace to "dist": "{localurl}/
+		pkg = regexp.MustCompile(`(?U)"tarball":"https?://.*/`).ReplaceAllString(string(body), `"tarball": "http://`+request.Host+"/")
 
 		// save to redis
 		err = proxy.Database.Set(key, pkg, options.DatabaseExpiration)

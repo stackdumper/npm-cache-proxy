@@ -153,12 +153,12 @@ Macbook Pro 15″ 2017, Intel Core i7-7700HQ. Note `GOMAXPROCS=1`.
 $ go-wrk -c 100 -d 10 http://localhost:8080/ascii
 Running 10s test @ http://localhost:8080/ascii
   100 goroutine(s) running concurrently
-84216 requests in 10.000196326s, 535.30MB read
-Requests/sec:		8421.43
-Transfer/sec:		53.53MB
-Avg Req Time:		11.874461ms
-Fastest Request:	2.213324ms
-Slowest Request:	745.874068ms
+120227 requests in 9.996788553s, 136.21MB read
+Requests/sec:		12026.56
+Transfer/sec:		13.63MB
+Avg Req Time:		8.314928ms
+Fastest Request:	1.157793ms
+Slowest Request:	782.917402ms
 Number of Errors:	0
 ```
 
