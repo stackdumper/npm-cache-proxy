@@ -77,6 +77,7 @@ ncp --listen "localhost:1234" # listen on port 1234
 | `--upstream <address>`  | `UPSTREAM_ADDRESS` | `https://registry.npmjs.org` | Upstream registry address           |
 | `--cache-limit <count>` | `CACHE_LIMIT`      | -                            | Cached packages count limit         |
 | `--cache-ttl <timeout>` | `CACHE_TTL`        | `3600`                       | Cache expiration timeout in seconds |
+| `--silent <address>`    | `SILENT`           | `0`                          | Disable logs                        |
 
 ---
 
@@ -146,17 +147,17 @@ NCP can be deployed using Kubernetes, Docker Compose or any other container orch
 Macbook Pro 15″ 2017, Intel Core i7-7700HQ. Note `GOMACPROCS=1`. 
 
 ```bash
-# GOMAXPROCS=1 ncp --listen localhost:8080
+# SILENT=1 GIN_MODE=release GOMAXPROCS=1 ncp
 
-$ go-wrk -c 100 -d 5 http://localhost:8080/ascii
-Running 5s test @ http://localhost:8080/ascii
+$ go-wrk -c 100 -d 10 http://localhost:8080/ascii
+Running 10s test @ http://localhost:8080/ascii
   100 goroutine(s) running concurrently
-33321 requests in 5.00537759s, 212.69MB read
-Requests/sec:		6657.04
-Transfer/sec:		42.49MB
-Avg Req Time:		15.02169ms
-Fastest Request:	230.514µs
-Slowest Request:	571.420487ms
+84216 requests in 10.000196326s, 535.30MB read
+Requests/sec:		8421.43
+Transfer/sec:		53.53MB
+Avg Req Time:		11.874461ms
+Fastest Request:	2.213324ms
+Slowest Request:	745.874068ms
 Number of Errors:	0
 ```
 

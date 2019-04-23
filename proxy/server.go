@@ -13,14 +13,20 @@ import (
 // ServerOptions provides configuration for Server method
 type ServerOptions struct {
 	ListenAddress string
+	Silent        bool
 }
 
 // Server creates http proxy server
 func (proxy Proxy) Server(options ServerOptions) *http.Server {
 	router := gin.New()
 
-	logger, _ := zap.NewProduction()
-	router.Use(ginzap.Ginzap(logger, time.RFC3339, true))
+	if options.Silent {
+		router.Use(gin.Recovery())
+	} else {
+		logger, _ := zap.NewProduction()
+		router.Use(ginzap.Ginzap(logger, time.RFC3339, true))
+		router.Use(ginzap.RecoveryWithZap(logger, true))
+	}
 
 	router.GET("/:scope/:name", proxy.getPackageHandler)
 	router.GET("/:scope", proxy.getPackageHandler)

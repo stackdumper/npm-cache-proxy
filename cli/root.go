@@ -15,6 +15,7 @@ var rootCmd = &cobra.Command{
 }
 
 var rootOptions struct {
+	Silent          bool
 	ListenAddress   string
 	UpstreamAddress string
 	CacheLimit      string
@@ -22,6 +23,7 @@ var rootOptions struct {
 }
 
 func init() {
+	rootCmd.Flags().BoolVar(&rootOptions.Silent, "silent", getEnvBool("SILENT", "0"), "Disable logging")
 	rootCmd.Flags().StringVar(&rootOptions.ListenAddress, "listen", getEnvString("LISTEN_ADDRESS", "localhost:8080"), "Address to listen")
 	rootCmd.Flags().StringVar(&rootOptions.UpstreamAddress, "upstream", getEnvString("UPSTREAM_ADDRESS", "https://registry.npmjs.org"), "Upstream registry address")
 	rootCmd.Flags().StringVar(&rootOptions.CacheLimit, "cache-limit", getEnvString("CACHE_LIMIT", "0"), "Cached packages count limit")
@@ -39,5 +41,6 @@ func run(cmd *cobra.Command, args []string) {
 
 	proxy.Server(npmproxy.ServerOptions{
 		ListenAddress: rootOptions.ListenAddress,
+		Silent:        rootOptions.Silent,
 	}).ListenAndServe()
 }

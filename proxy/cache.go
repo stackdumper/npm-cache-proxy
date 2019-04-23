@@ -57,8 +57,9 @@ func (proxy Proxy) GetCachedPath(path string, request *http.Request) ([]byte, er
 			return nil, err
 		}
 
-		// convert body to string
-		pkg = string(body)
+		// TODO: avoid calling MustCompile every time
+		// find "dist": "https?://.*/ and replace to "dist": "{localurl}/
+		pkg = regexp.MustCompile(`(?U)"tarball":"https?://.*/`).ReplaceAllString(string(body), `"dist": "http://localhost:8080/`)
 
 		// save to redis
 		err = proxy.Database.Set(key, pkg, options.DatabaseExpiration)
@@ -66,10 +67,6 @@ func (proxy Proxy) GetCachedPath(path string, request *http.Request) ([]byte, er
 			return nil, err
 		}
 	}
-
-	// TODO: avoid calling MustCompile every time
-	// find "dist": "https?://.*/ and replace to "dist": "{localurl}/
-	pkg = regexp.MustCompile(`(?U)"tarball":"https?://.*/`).ReplaceAllString(pkg, `"dist": "http://localhost:8080/`)
 
 	return []byte(pkg), nil
 }

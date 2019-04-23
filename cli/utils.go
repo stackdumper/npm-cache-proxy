@@ -23,3 +23,12 @@ func getEnvInt(env string, def string) int {
 
 	return converted
 }
+
+func getEnvBool(env string, def string) bool {
+	value := getEnvString(env, def)
+
+	// TODO: handle error
+	converted, _ := strconv.ParseBool(value)
+
+	return converted
+}
