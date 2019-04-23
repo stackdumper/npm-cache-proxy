@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -54,7 +55,7 @@ func (proxy Proxy) getPackageHandler(options ServerOptions) gin.HandlerFunc {
 			if err != nil {
 				c.AbortWithError(500, err)
 			} else {
-				c.Header("Cache-Control", "public, max-age="+string(int(options.DatabaseExpiration.Seconds())))
+				c.Header("Cache-Control", "public, max-age="+strconv.Itoa(int(options.DatabaseExpiration.Seconds())))
 				c.Data(200, "application/json", pkg)
 			}
 		}
