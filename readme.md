@@ -43,7 +43,7 @@ Release binaries for different platforms can be downloaded on the [Releases](htt
 The fastest way to get started with NCP is to use Docker image:
 ```bash
 # run proxy inside of docker container in background
-docker run -e REDIS_ADDRESS=host.docker.internal:6379 -p 8080:8080 -it emeralt/npm-cache-proxy -d
+docker run -e REDIS_ADDRESS=host.docker.internal:6379 -p 8080:8080 -it -d emeralt/npm-cache-proxy
 
 # configure npm to use caching proxy as registry
 npm config set registry http://localhost:8080
