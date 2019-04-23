@@ -144,7 +144,7 @@ func main() {
 NCP can be deployed using Kubernetes, Docker Compose or any other container orchestration platform. NCP supports running indefinite amount of instances simultaneously. 
 
 ## Benchmark
-Macbook Pro 15″ 2017, Intel Core i7-7700HQ. Note `GOMACPROCS=1`. 
+Macbook Pro 15″ 2017, Intel Core i7-7700HQ. Note `GOMAXPROCS=1`. 
 
 ```bash
 # SILENT=1 GIN_MODE=release GOMAXPROCS=1 ncp
