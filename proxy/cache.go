@@ -10,12 +10,7 @@ import (
 )
 
 // GetCachedPath returns cached upstream response for a given url path.
-func (proxy Proxy) GetCachedPath(path string, request *http.Request) ([]byte, error) {
-	options, err := proxy.GetOptions()
-	if err != nil {
-		return nil, err
-	}
-
+func (proxy Proxy) GetCachedPath(options Options, path string, request *http.Request) ([]byte, error) {
 	key := options.DatabasePrefix + path
 
 	// get package from database
@@ -72,12 +67,7 @@ func (proxy Proxy) GetCachedPath(path string, request *http.Request) ([]byte, er
 }
 
 // ListCachedPaths returns list of all cached url paths.
-func (proxy Proxy) ListCachedPaths() ([]string, error) {
-	options, err := proxy.GetOptions()
-	if err != nil {
-		return nil, err
-	}
-
+func (proxy Proxy) ListCachedPaths(options Options) ([]string, error) {
 	metadata, err := proxy.Database.Keys(options.DatabasePrefix)
 	if err != nil {
 		return nil, err
@@ -92,12 +82,7 @@ func (proxy Proxy) ListCachedPaths() ([]string, error) {
 }
 
 // PurgeCachedPaths deletes all cached url paths.
-func (proxy Proxy) PurgeCachedPaths() error {
-	options, err := proxy.GetOptions()
-	if err != nil {
-		return err
-	}
-
+func (proxy Proxy) PurgeCachedPaths(options Options) error {
 	metadata, err := proxy.Database.Keys(options.DatabasePrefix)
 	if err != nil {
 		return err

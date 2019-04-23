@@ -107,23 +107,29 @@ import (
 	"time"
 
 	npmproxy "github.com/emeralt/npm-cache-proxy/proxy"
-	redis "github.com/go-redis/redis"
+	"github.com/go-redis/redis"
 )
 
 func main() {
+	// create proxy
 	proxy := npmproxy.Proxy{
-		// you can provide you own Database
-		// or use an existing one
+		// use redis as database
 		Database: npmproxy.DatabaseRedis{
+			// see github.com/go-redis/redis
 			Client: redis.NewClient(&redis.Options{
 				Addr:     "localhost:6379",
 			}),
 		},
 
-		// allows to reuse tcp connections
+		// reuse connections
 		HttpClient: &http.Client{},
+	}
 
-		// allows to get options dynamically
+	// create and start server
+	proxy.Server(npmproxy.ServerOptions{
+		ListenAddress: "localhost:8080",
+
+		// allow fetching options dynamically on each request
 		GetOptions: func() (npmproxy.Options, error) {
 			return npmproxy.Options{
 				DatabasePrefix:     "ncp-",
@@ -131,11 +137,6 @@ func main() {
 				UpstreamAddress:    "https://registry.npmjs.org",
 			}, nil
 		},
-	}
-
-	// listen on http://localhost:8080
-	proxy.Server(npmproxy.ServerOptions{
-		ListenAddress: "localhost:8080",
 	}).ListenAndServe()
 }
 ```

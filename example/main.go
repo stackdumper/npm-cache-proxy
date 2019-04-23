@@ -18,6 +18,10 @@ func main() {
 			}),
 		},
 		HttpClient: &http.Client{},
+	}
+
+	proxy.Server(npmproxy.ServerOptions{
+		ListenAddress: "localhost:8080",
 		GetOptions: func() (npmproxy.Options, error) {
 			return npmproxy.Options{
 				DatabasePrefix:     "ncp-",
@@ -25,9 +29,5 @@ func main() {
 				UpstreamAddress:    "https://registry.npmjs.org",
 			}, nil
 		},
-	}
-
-	proxy.Server(npmproxy.ServerOptions{
-		ListenAddress: "localhost:8080",
 	}).ListenAndServe()
 }

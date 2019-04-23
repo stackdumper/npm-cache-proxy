@@ -12,13 +12,11 @@ var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all cached paths",
 	Run: func(cmd *cobra.Command, args []string) {
-		proxy := getProxy(func() (npmproxy.Options, error) {
-			return npmproxy.Options{
-				DatabasePrefix: persistentOptions.RedisPrefix,
-			}, nil
-		})
+		proxy := getProxy()
 
-		metadatas, err := proxy.ListCachedPaths()
+		metadatas, err := proxy.ListCachedPaths(npmproxy.Options{
+			DatabasePrefix: persistentOptions.RedisPrefix,
+		})
 		if err != nil {
 			panic(err)
 		}

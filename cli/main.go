@@ -25,7 +25,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&persistentOptions.RedisPrefix, "redis-prefix", getEnvString("REDIS_PREFIX", "ncp-"), "Redis prefix")
 }
 
-func getProxy(getOptions func() (npmproxy.Options, error)) *npmproxy.Proxy {
+func getProxy() *npmproxy.Proxy {
 	return &npmproxy.Proxy{
 		Database: npmproxy.DatabaseRedis{
 			Client: redis.NewClient(&redis.Options{
@@ -37,7 +37,6 @@ func getProxy(getOptions func() (npmproxy.Options, error)) *npmproxy.Proxy {
 		HttpClient: &http.Client{
 			Transport: http.DefaultTransport,
 		},
-		GetOptions: getOptions,
 	}
 }
 

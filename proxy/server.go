@@ -14,10 +14,14 @@ import (
 type ServerOptions struct {
 	ListenAddress string
 	Silent        bool
+
+	GetOptions func() (Options, error)
 }
 
 // Server creates http proxy server
 func (proxy Proxy) Server(options ServerOptions) *http.Server {
+	gin.SetMode("release")
+
 	router := gin.New()
 
 	if options.Silent {
@@ -28,9 +32,9 @@ func (proxy Proxy) Server(options ServerOptions) *http.Server {
 		router.Use(ginzap.RecoveryWithZap(logger, true))
 	}
 
-	router.GET("/:scope/:name", proxy.getPackageHandler)
-	router.GET("/:scope", proxy.getPackageHandler)
-	router.NoRoute(proxy.noRouteHandler)
+	router.GET("/:scope/:name", proxy.getPackageHandler(options))
+	router.GET("/:scope", proxy.getPackageHandler(options))
+	router.NoRoute(proxy.noRouteHandler(options))
 
 	return &http.Server{
 		Handler: router,
@@ -38,45 +42,50 @@ func (proxy Proxy) Server(options ServerOptions) *http.Server {
 	}
 }
 
-func (proxy Proxy) getPackageHandler(c *gin.Context) {
-	pkg, err := proxy.GetCachedPath(c.Request.URL.Path, c.Request)
-
-	if err != nil {
-		c.AbortWithError(500, err)
-	} else {
-		// c.Header("Content-Encoding", "gzip")
-		c.Data(200, "application/json", pkg)
-	}
-}
-
-func (proxy Proxy) getTarballHabdler(c *gin.Context) {
-	pkg, err := proxy.GetCachedPath(c.Request.URL.Path, c.Request)
-
-	if err != nil {
-		c.AbortWithError(500, err)
-	} else {
-		c.Data(200, "application/json", pkg)
-	}
-}
-
-func (proxy Proxy) noRouteHandler(c *gin.Context) {
-	if strings.Contains(c.Request.URL.Path, ".tgz") {
-		proxy.getTarballHabdler(c)
-	} else if c.Request.URL.Path == "/" {
-		err := proxy.Database.Health()
+func (proxy Proxy) getPackageHandler(options ServerOptions) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		options, err := options.GetOptions()
 
 		if err != nil {
-			c.AbortWithStatusJSON(503, err)
+			c.AbortWithError(500, err)
 		} else {
-			c.AbortWithStatusJSON(200, gin.H{"ok": true})
+			pkg, err := proxy.GetCachedPath(options, c.Request.URL.Path, c.Request)
+
+			if err != nil {
+				c.AbortWithError(500, err)
+			} else {
+				c.Header("Cache-Control", "public, max-age="+string(int(options.DatabaseExpiration.Seconds())))
+				c.Data(200, "application/json", pkg)
+			}
 		}
-	} else {
-		options, err := proxy.GetOptions()
+	}
+}
 
-		if err != nil {
-			c.AbortWithStatusJSON(500, err)
+func (proxy Proxy) noRouteHandler(options ServerOptions) gin.HandlerFunc {
+	tarballHandler := proxy.getPackageHandler(options)
+
+	return func(c *gin.Context) {
+		if strings.Contains(c.Request.URL.Path, ".tgz") {
+			// get tarball
+			tarballHandler(c)
+		} else if c.Request.URL.Path == "/" {
+			// get health
+			err := proxy.Database.Health()
+
+			if err != nil {
+				c.AbortWithStatusJSON(503, err)
+			} else {
+				c.AbortWithStatusJSON(200, gin.H{"ok": true})
+			}
 		} else {
-			c.Redirect(http.StatusTemporaryRedirect, options.UpstreamAddress+c.Request.URL.Path)
+			// redirect
+			options, err := options.GetOptions()
+
+			if err != nil {
+				c.AbortWithStatusJSON(500, err)
+			} else {
+				c.Redirect(http.StatusTemporaryRedirect, options.UpstreamAddress+c.Request.URL.Path)
+			}
 		}
 	}
 }

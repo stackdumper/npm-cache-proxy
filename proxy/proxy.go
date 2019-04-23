@@ -14,8 +14,6 @@ import (
 type Proxy struct {
 	Database   Database
 	HttpClient *http.Client
-
-	GetOptions func() (Options, error)
 }
 
 // Options provides dynamic options for Proxy.

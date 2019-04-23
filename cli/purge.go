@@ -10,13 +10,11 @@ var purgeCmd = &cobra.Command{
 	Use:   "purge",
 	Short: "Purge all cached paths",
 	Run: func(cmd *cobra.Command, args []string) {
-		proxy := getProxy(func() (npmproxy.Options, error) {
-			return npmproxy.Options{
-				DatabasePrefix: persistentOptions.RedisPrefix,
-			}, nil
-		})
+		proxy := getProxy()
 
-		err := proxy.PurgeCachedPaths()
+		err := proxy.PurgeCachedPaths(npmproxy.Options{
+			DatabasePrefix: persistentOptions.RedisPrefix,
+		})
 		if err != nil {
 			panic(err)
 		}

@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"log"
 	"time"
 
 	npmproxy "github.com/emeralt/npm-cache-proxy/proxy"
@@ -31,16 +32,24 @@ func init() {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	proxy := getProxy(func() (npmproxy.Options, error) {
-		return npmproxy.Options{
-			DatabasePrefix:     persistentOptions.RedisPrefix,
-			DatabaseExpiration: time.Duration(rootOptions.CacheTTL) * time.Second,
-			UpstreamAddress:    rootOptions.UpstreamAddress,
-		}, nil
-	})
+	proxy := getProxy()
 
-	proxy.Server(npmproxy.ServerOptions{
+	log.Print("Listening on " + rootOptions.ListenAddress)
+
+	err := proxy.Server(npmproxy.ServerOptions{
 		ListenAddress: rootOptions.ListenAddress,
 		Silent:        rootOptions.Silent,
+
+		GetOptions: func() (npmproxy.Options, error) {
+			return npmproxy.Options{
+				DatabasePrefix:     persistentOptions.RedisPrefix,
+				DatabaseExpiration: time.Duration(rootOptions.CacheTTL) * time.Second,
+				UpstreamAddress:    rootOptions.UpstreamAddress,
+			}, nil
+		},
 	}).ListenAndServe()
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
