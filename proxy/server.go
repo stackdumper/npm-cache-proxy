@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	ginzap "github.com/gin-contrib/zap"
@@ -32,14 +33,7 @@ func (proxy Proxy) Server(options ServerOptions) *http.Server {
 }
 
 func (proxy Proxy) getPackageHandler(c *gin.Context) {
-	var name string
-	if c.Param("name") != "" {
-		name = c.Param("scope") + "/" + c.Param("name")
-	} else {
-		name = c.Param("scope")
-	}
-
-	pkg, err := proxy.GetMetadata(name, c.Request.URL.Path, c.Request)
+	pkg, err := proxy.GetCachedPath(c.Request.URL.Path, c.Request)
 
 	if err != nil {
 		c.AbortWithError(500, err)
@@ -49,8 +43,20 @@ func (proxy Proxy) getPackageHandler(c *gin.Context) {
 	}
 }
 
+func (proxy Proxy) getTarballHabdler(c *gin.Context) {
+	pkg, err := proxy.GetCachedPath(c.Request.URL.Path, c.Request)
+
+	if err != nil {
+		c.AbortWithError(500, err)
+	} else {
+		c.Data(200, "application/json", pkg)
+	}
+}
+
 func (proxy Proxy) noRouteHandler(c *gin.Context) {
-	if c.Request.URL.Path == "/" {
+	if strings.Contains(c.Request.URL.Path, ".tgz") {
+		proxy.getTarballHabdler(c)
+	} else if c.Request.URL.Path == "/" {
 		err := proxy.Database.Health()
 
 		if err != nil {

@@ -8,7 +8,7 @@ import (
 // start a server
 var purgeCmd = &cobra.Command{
 	Use:   "purge",
-	Short: "Purge all cached packages",
+	Short: "Purge all cached paths",
 	Run: func(cmd *cobra.Command, args []string) {
 		proxy := getProxy(func() (npmproxy.Options, error) {
 			return npmproxy.Options{
@@ -16,7 +16,7 @@ var purgeCmd = &cobra.Command{
 			}, nil
 		})
 
-		err := proxy.PurgeMetadata()
+		err := proxy.PurgeCachedPaths()
 		if err != nil {
 			panic(err)
 		}

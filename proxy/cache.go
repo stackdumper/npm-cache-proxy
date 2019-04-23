@@ -5,17 +5,18 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
 )
 
-// GetMetadata returns cached NPM response for a given package path.
-func (proxy Proxy) GetMetadata(name string, originalPath string, request *http.Request) ([]byte, error) {
+// GetCachedPath returns cached upstream response for a given url path.
+func (proxy Proxy) GetCachedPath(path string, request *http.Request) ([]byte, error) {
 	options, err := proxy.GetOptions()
 	if err != nil {
 		return nil, err
 	}
 
-	key := options.DatabasePrefix + name
+	key := options.DatabasePrefix + path
 
 	// get package from database
 	pkg, err := proxy.Database.Get(key)
@@ -31,7 +32,7 @@ func (proxy Proxy) GetMetadata(name string, originalPath string, request *http.R
 
 		// error is caused by nonexistent package
 		// fetch package
-		req, err := http.NewRequest("GET", options.UpstreamAddress+originalPath, nil)
+		req, err := http.NewRequest("GET", options.UpstreamAddress+path, nil)
 
 		req.Header = request.Header
 		req.Header.Set("Accept-Encoding", "gzip")
@@ -66,15 +67,15 @@ func (proxy Proxy) GetMetadata(name string, originalPath string, request *http.R
 		}
 	}
 
-	// replace tarball urls
-	// FIXME: unmarshall and replace only necessary fields
-	// convertedPkg := strings.ReplaceAll(string(pkg), options.ReplaceAddress, options.StaticServerAddress)
+	// TODO: avoid calling MustCompile every time
+	// find "dist": "https?://.*/ and replace to "dist": "{localurl}/
+	pkg = regexp.MustCompile(`(?U)"tarball":"https?://.*/`).ReplaceAllString(pkg, `"dist": "http://localhost:8080/`)
 
 	return []byte(pkg), nil
 }
 
-// ListMetadata returns list of all cached packages
-func (proxy Proxy) ListMetadata() ([]string, error) {
+// ListCachedPaths returns list of all cached url paths.
+func (proxy Proxy) ListCachedPaths() ([]string, error) {
 	options, err := proxy.GetOptions()
 	if err != nil {
 		return nil, err
@@ -93,8 +94,8 @@ func (proxy Proxy) ListMetadata() ([]string, error) {
 	return deprefixedMetadata, nil
 }
 
-// PurgeMetadata deletes all cached packages.
-func (proxy Proxy) PurgeMetadata() error {
+// PurgeCachedPaths deletes all cached url paths.
+func (proxy Proxy) PurgeCachedPaths() error {
 	options, err := proxy.GetOptions()
 	if err != nil {
 		return err

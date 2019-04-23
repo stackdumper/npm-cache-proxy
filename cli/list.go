@@ -10,7 +10,7 @@ import (
 // start a server
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "List all cached packages",
+	Short: "List all cached paths",
 	Run: func(cmd *cobra.Command, args []string) {
 		proxy := getProxy(func() (npmproxy.Options, error) {
 			return npmproxy.Options{
@@ -18,7 +18,7 @@ var listCmd = &cobra.Command{
 			}, nil
 		})
 
-		metadatas, err := proxy.ListMetadata()
+		metadatas, err := proxy.ListCachedPaths()
 		if err != nil {
 			panic(err)
 		}
