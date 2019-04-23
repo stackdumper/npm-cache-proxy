@@ -51,9 +51,6 @@ npm config set registry http://localhost:8080
 ## CLI
 NCP provides command line interface for interaction with a cached data.
 
-#### `ncp`
-Start NCP server.
-
 <details>
 <summary>Options</summary>
 
@@ -70,6 +67,9 @@ Start NCP server.
 | `--redis-prefix <prefix>`     | `REDIS_PREFIX`     | `ncp-`                       | Redis keys prefix                   |
 
 </details>
+
+#### `ncp`
+Start NCP server.
 
 #### `ncp list`
 List cached url paths.
