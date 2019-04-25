@@ -20,7 +20,7 @@
 ## Introduction
 
 #### ⚡️ Performance
-NCP is a tiny but very fast caching proxy written and Go. It uses Redis for data storage, which in combination with the speed of Go makes it incredibly fast. NCP is well-optimized and can be run on almost any platform, so if you have a Raspberry Pi, you can install NCP as your local cache there.
+NCP is a tiny but very fast caching proxy written in Go. It uses Redis for data storage, which in combination with the speed of Go makes it incredibly fast. NCP is well-optimized and can be run on almost any platform, so if you have a Raspberry Pi, you can install NCP as your local cache there.
 
 #### ✨ Modularity
 NCP is modular. Now it has only one database adapter which is Redis. If you need support for any other database, feel free to open an issue or implement it [on your own](https://github.com/emeralt/npm-cache-proxy/blob/7c8b90ff6ba0656f60e3de915b9fb4eaabfb467b/proxy/proxy.go#L29) and then open a pull request (_bonus points_).
