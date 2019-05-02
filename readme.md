@@ -9,7 +9,7 @@
   <a href="https://hub.docker.com/r/emeralt/npm-cache-proxy/builds">
     <img src="https://img.shields.io/docker/cloud/build/emeralt/npm-cache-proxy.svg" alt="CI Build">
   </a>
-  <a href="https://github.com/emeralt/npm-cache-proxy/blob/master/liscense">
+  <a href="https://github.com/emeralt/npm-cache-proxy/blob/master/license">
     <img src="https://img.shields.io/github/license/emeralt/npm-cache-proxy.svg" alt="Licence">
   </a>
 </div>
