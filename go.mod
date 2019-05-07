@@ -1,4 +1,4 @@
-module github.com/emeralt/npm-cache-proxy
+module github.com/pkgems/npm-cache-proxy
 
 go 1.12
 

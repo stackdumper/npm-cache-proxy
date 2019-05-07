@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	npmproxy "github.com/emeralt/npm-cache-proxy/proxy"
+	npmproxy "github.com/pkgems/npm-cache-proxy/proxy"
 	"github.com/go-redis/redis"
 )
 

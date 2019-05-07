@@ -3,14 +3,14 @@
 
   <h1>npm-cache-proxy</h1>
 
-  <a href="https://hub.docker.com/r/emeralt/npm-cache-proxy/tags">
-    <img src="https://img.shields.io/github/release/emeralt/npm-cache-proxy.svg" alt="Current Release" />
+  <a href="https://hub.docker.com/r/pkgems/npm-cache-proxy/tags">
+    <img src="https://img.shields.io/github/release/pkgems/npm-cache-proxy.svg" alt="Current Release" />
   </a>
-  <a href="https://hub.docker.com/r/emeralt/npm-cache-proxy/builds">
-    <img src="https://img.shields.io/docker/cloud/build/emeralt/npm-cache-proxy.svg" alt="CI Build">
+  <a href="https://hub.docker.com/r/pkgems/npm-cache-proxy/builds">
+    <img src="https://img.shields.io/docker/cloud/build/pkgems/npm-cache-proxy.svg" alt="CI Build">
   </a>
-  <a href="https://github.com/emeralt/npm-cache-proxy/blob/master/license">
-    <img src="https://img.shields.io/github/license/emeralt/npm-cache-proxy.svg" alt="Licence">
+  <a href="https://github.com/pkgems/npm-cache-proxy/blob/master/license">
+    <img src="https://img.shields.io/github/license/pkgems/npm-cache-proxy.svg" alt="Licence">
   </a>
 </div>
 
@@ -23,7 +23,7 @@
 NCP is a tiny but very fast caching proxy written in Go. It uses Redis for data storage, which in combination with the speed of Go makes it incredibly fast. NCP is well-optimized and can be run on almost any platform, so if you have a Raspberry Pi, you can install NCP as your local cache there.
 
 #### ✨ Modularity
-NCP is modular. Now it has only one database adapter which is Redis. If you need support for any other database, feel free to open an issue or implement it [on your own](https://github.com/emeralt/npm-cache-proxy/blob/7c8b90ff6ba0656f60e3de915b9fb4eaabfb467b/proxy/proxy.go#L29) and then open a pull request (_bonus points_).
+NCP is modular. Now it has only one database adapter which is Redis. If you need support for any other database, feel free to open an issue or implement it [on your own](https://github.com/pkgems/npm-cache-proxy/blob/7c8b90ff6ba0656f60e3de915b9fb4eaabfb467b/proxy/proxy.go#L29) and then open a pull request (_bonus points_).
 
 #### 💡 Simplicity
 NCP is very simple. It just proxies requests to an upstream registry, caches response and returns cached response for next requests to the same package. Cached data are stored in Redis with an original request URL as a key.
@@ -33,14 +33,14 @@ NCP is very simple. It just proxies requests to an upstream registry, caches res
 
 
 ## Installation
-NCP binaries for different paltforms can be downloaded can be downloaded on the [Releases](https://github.com/emeralt/npm-cache-proxy/releases) page. Also, Docker image is provided on [Docker Hub](https://cloud.docker.com/u/emeralt/repository/docker/emeralt/npm-cache-proxy).
+NCP binaries for different paltforms can be downloaded can be downloaded on the [Releases](https://github.com/pkgems/npm-cache-proxy/releases) page. Also, Docker image is provided on [Docker Hub](https://cloud.docker.com/u/pkgems/repository/docker/pkgems/npm-cache-proxy).
 
 #### 💫 Quick Start
 The quickies way to get started with NCP is to use Docker.
 
 ```bash
 # run proxy inside of docker container in background
-docker run -e REDIS_ADDRESS=host.docker.internal:6379 -p 8080:8080 -it -d emeralt/npm-cache-proxy
+docker run -e REDIS_ADDRESS=host.docker.internal:6379 -p 8080:8080 -it -d pkgems/npm-cache-proxy
 
 # configure npm to use caching proxy as registry
 npm config set registry http://localhost:8080
@@ -127,7 +127,7 @@ Number of Errors:	0
 
 
 ## Programmatic Usage
-NCP provides `proxy` go package that can be used programmatically. Docs are available on [godoc.org](https://godoc.org/github.com/emeralt/npm-cache-proxy/proxy).
+NCP provides `proxy` go package that can be used programmatically. Docs are available on [godoc.org](https://godoc.org/github.com/pkgems/npm-cache-proxy/proxy).
 
 #### 🤖 Example
 ```golang
@@ -137,7 +137,7 @@ import (
 	"net/http"
 	"time"
 
-	npmproxy "github.com/emeralt/npm-cache-proxy/proxy"
+	npmproxy "github.com/pkgems/npm-cache-proxy/proxy"
 	"github.com/go-redis/redis"
 )
 
