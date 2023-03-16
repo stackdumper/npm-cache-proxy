@@ -13,6 +13,6 @@
 
 # Build
 build/
-
+chart/
 # APFS cache
 .DS_Store
